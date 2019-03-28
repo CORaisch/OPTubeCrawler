@@ -10,7 +10,7 @@ The script crawler.py will crawl http://onepiece-tube.com/ for the given chapter
 subdirectory out/. It's written in Python 3 and not tested in Python 2. Also it's only tested under UNIX based systems.
 
 *** Usage:
-python3 crawler.py <CHAPTER X> <CHAPTER Y>
+python3 crawler.py <CHAPTER X> <CHAPTER Y>\\
 /Downloads all One Piece chapters from X to Y as images into directory out//
 
 ** chapter2pdf.sh
@@ -19,5 +19,5 @@ To run the script make it executable before (chmod +x chapter2pdf) and do not ch
 The script also uses ImageMagick for the converting task, so ensure to install it before using. 
 
 *** Usage:
-./chapter2pdf <CHAPTER X> <CHAPTER Y>
+./chapter2pdf <CHAPTER X> <CHAPTER Y>\\
 /Combines the images from the subdirectories X to Y into PDF files/
