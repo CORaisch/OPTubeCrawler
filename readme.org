@@ -1,0 +1,23 @@
+#+TITLE: One Piece Tube Crawler
+#+OPTIONS: tex:t
+#+OPTIONS: toc:nil
+
+* Overview
+This repo provides simple scripts that will crawl the website http://onepiece-tube.com/ and download desired manga chapters.
+
+** crawl.py
+The script crawler.py will crawl http://onepiece-tube.com/ for the given chapters and download the images of the chapters in a
+subdirectory out/. It's written in Python 3 and not tested in Python 2. Also it's only tested under UNIX based systems.
+
+*** Usage:
+python3 crawler.py <CHAPTER X> <CHAPTER Y>
+/Downloads all One Piece chapters from X to Y as images into directory out//
+
+** chapter2pdf.sh
+The Bash-script chapter2pdf will combine the downloaded chapter images into one PDF file per chapter. Use this script after crawl.py.
+To run the script make it executable before (chmod +x chapter2pdf) and do not change the directory structure built by crawl.py.
+The script also uses ImageMagick for the converting task, so ensure to install it before using. 
+
+*** Usage:
+./chapter2pdf <CHAPTER X> <CHAPTER Y>
+/Combines the images from the subdirectories X to Y into PDF files/
