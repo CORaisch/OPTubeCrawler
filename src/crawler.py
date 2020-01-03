@@ -1,18 +1,20 @@
-import urllib.request
+from urllib.request import urlopen, Request
 from html.parser import HTMLParser
 import binascii
 import argparse
 import re
 import os
- 
+
 # global functions
-def saveImg(url, name):
+def saveImg(url, name, header):
     if name == "-1" or url == "-1":
-        "No a correct url or name for an image!"
+        print("Not a correct URL or name for an image!")
         exit()
     else:
         print("download image \"", url, "\"")
-        urllib.request.urlretrieve(url, name)
+        req = Request(url=url, headers=header)
+        with urlopen(req) as response, open(name, 'wb') as out:
+            out.write(response.read())
 
 # overwrite HTMLParser interface
 class htmlParser(HTMLParser):
@@ -21,20 +23,14 @@ class htmlParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         if tag == "img":
             for a in attrs:
-                if a[0] == "src": 
-                    strImg = re.findall('.*\.jpg', a[1])
-                    # on some pages the images are stored as png so further
-                    # check for it if necessary
-                    if not strImg:
-                        strTmp = re.findall('.*\.png', a[1])
-                        # there is another png on the site inside a img-tag
-                        # so further check and select the correct one
-                        tmpMatch = re.search('tasten', a[1])
-                        if tmpMatch == None:
-                            strImg = re.findall('.*\.png', a[1])
+                if a[0] == "src":
+                    strImg = re.findall('.*\.(?:jpg|jpeg|png)', a[1])
+                    # there is another png on the site inside a img-tag called 'tasten'
+                    # so further check and skip it
+                    if re.search('tasten', a[1]):
+                        continue
                     if strImg:
                         self.imgURL  = strImg[0]
-                        # urllib.request.urlretrieve(strImg[0], name)
 
         if tag == "a":
             for a in attrs:
@@ -76,12 +72,14 @@ for chapter in range(chapters[0], chapters[1]+1):
     if not os.path.exists(chap_dir):
         os.makedirs(chap_dir)
 
-    i   = 1
+    i = 1
     url = "http://onepiece-tube.com/kapitel/" + str(chapter) + "/"
+    header = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/79.0.3945.79 Chrome/79.0.3945.79 Safari/537.36'}
 
     while True:
         # download site from one piece tube webpage
-        contents = urllib.request.urlopen(url + str(i)).read()
+        req = Request(url=url+str(i), headers=header)
+        contents = urlopen(req).read()
 
         # parser html site
         parser = htmlParser()
@@ -91,13 +89,12 @@ for chapter in range(chapters[0], chapters[1]+1):
         split = parser.imgURL.split("/")
         terminator = split[-1]
         imgName = base + str(chapter) + "/" + terminator
-        saveImg(parser.imgURL, imgName)
+        saveImg(parser.imgURL, imgName, header)
 
         # get number of pages of requested chapter
         pages = int(parser.numSites)
-        # increment page count
-        i = i + 1
 
         # check if all pages are downloaded
+        i += 1
         if i > pages:
             break;
